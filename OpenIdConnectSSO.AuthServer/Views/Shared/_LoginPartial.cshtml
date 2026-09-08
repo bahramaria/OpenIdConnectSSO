@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+
+@{
+    string authenticationType = User.Identity?.AuthenticationType == "Identity.Application" ? "Local" : "SSO";
+}
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item">
+        @* @User.Identity?.Name
+        <span class="badge bg-secondary">@authenticationType</span> *@
+
+        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a asp-controller="Account" asp-action="Login" class="nav-link">
+            Login
+        </a>
+    </li>
+}

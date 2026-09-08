@@ -1,0 +1,81 @@
+﻿@model SsoErrorViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>خطای ورود</title>
+    <style>
+
+        body{
+            font-family:Tahoma;
+            background:#f5f6fa;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            height:100vh;
+        }
+
+        .box{
+            width:420px;
+            background:white;
+            padding:35px;
+            border-radius:10px;
+            box-shadow:0 4px 20px rgba(0,0,0,0.08);
+            text-align:center;
+        }
+
+        .title{
+            font-size:20px;
+            margin-bottom:15px;
+            color:#d63031;
+        }
+
+        .msg{
+            color:#555;
+            margin-bottom:20px;
+        }
+
+        .errorId{
+            font-size:12px;
+            color:#999;
+            margin-bottom:20px;
+        }
+
+        .btn{
+            display:inline-block;
+            padding:10px 20px;
+            background:#0984e3;
+            color:white;
+            text-decoration:none;
+            border-radius:6px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+
+        <div class="title">@Model.Title</div>
+
+        <div class="msg">
+            @Model.Message
+        </div>
+
+        <div class="errorId">
+            ErrorId : @Model.ErrorId
+        </div>
+
+        <a asp-controller="Account" asp-action="Login" class="btn">
+            تلاش مجدد برای ورود
+        </a>
+
+    </div>
+
+</body>
+</html>

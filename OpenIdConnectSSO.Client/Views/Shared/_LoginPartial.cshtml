@@ -1,0 +1,42 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@* @inject SignInManager<IdentityUser> SignInManager *@
+
+@{
+    string username = "";
+    string authType = "";
+
+    if (User.Identity?.AuthenticationType == IdentityConstants.ApplicationScheme)
+    {
+        username = User.Identity.Name!;
+        authType = "Local";
+    }
+    else
+    {
+        username = User.FindFirstValue("name")!;
+        authType = "SSO";
+    }
+}
+
+<ul class="navbar-nav">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <li class="nav-item">
+            <a class="nav-link">
+                @username
+                <span class="badge bg-secondary">@authType</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a asp-controller="Account" asp-action="Login" class="nav-link">
+                Login
+            </a>
+        </li>
+    }
+</ul>

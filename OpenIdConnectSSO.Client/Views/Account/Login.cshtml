@@ -1,0 +1,57 @@
+﻿@model LoginViewModel
+@{
+    ViewBag.Title = "Login";
+}
+
+<div class="login-panel col-4 offset-4">
+
+    <div class="card bg-light">
+        <div class="card-header bg-primary">
+            <div class="card-title text-light">@ViewBag.Title</div>
+        </div>
+        <div class="card-body">
+
+            @if (Context.Request.Query["error"] == "access_denied")
+            {
+                <div class="login-error">
+                    ورود توسط کاربر لغو شد
+                </div>
+            }
+
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <form method="post">
+
+                @* <input asp-for="ReturnUrl" type="hidden" /> *@
+
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label remove-required"></label>
+                    <input asp-for="Username" class="form-control" aria-describedby="usernameHelp" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label remove-required"></label>
+                    <input asp-for="Password" type="password" class="form-control" />
+                </div>
+
+                <div class="mb-3 form-check">
+                    <label asp-for="IsPersistent" class="form-check-label"></label>
+                    <input asp-for="IsPersistent" type="checkbox" class="form-check-input" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">@ViewBag.Title</button>
+                <a asp-controller="Account"
+                   asp-action="LoginWithSso"
+                   asp-route-returnUrl="@Context.Request.Query["returnUrl"]"
+                   class="btn btn-outline-dark">
+                    Login with SSO
+                </a>
+            </form>
+        </div>
+    </div>
+    
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenIdConnectSSO.AuthServer", "OpenIdConnectSSO.AuthServer\OpenIdConnectSSO.AuthServer.csproj", "{366F9CCB-0070-4A90-BCE9-61E5C8659358}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenIdConnectSSO.Client", "OpenIdConnectSSO.Client\OpenIdConnectSSO.Client.csproj", "{F20F4ADD-306F-481B-878B-A6EA3DCAE78B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenIdConnectSSO.Common", "OpenIdConnectSSO.Common\OpenIdConnectSSO.Common.csproj", "{B94A7369-53E7-4EAC-8875-9E3F902D37CF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{366F9CCB-0070-4A90-BCE9-61E5C8659358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{366F9CCB-0070-4A90-BCE9-61E5C8659358}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{366F9CCB-0070-4A90-BCE9-61E5C8659358}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{366F9CCB-0070-4A90-BCE9-61E5C8659358}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F20F4ADD-306F-481B-878B-A6EA3DCAE78B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F20F4ADD-306F-481B-878B-A6EA3DCAE78B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F20F4ADD-306F-481B-878B-A6EA3DCAE78B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F20F4ADD-306F-481B-878B-A6EA3DCAE78B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B94A7369-53E7-4EAC-8875-9E3F902D37CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B94A7369-53E7-4EAC-8875-9E3F902D37CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B94A7369-53E7-4EAC-8875-9E3F902D37CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B94A7369-53E7-4EAC-8875-9E3F902D37CF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {06D2F4AD-117B-4888-A8A0-8BDB0DF87A0C}
+	EndGlobalSection
+EndGlobal
