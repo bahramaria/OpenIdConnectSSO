@@ -50,7 +50,7 @@ public class OidcErrorHandlingTests
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddAuthentication()
-            .AddOpenIdConnectSSOConfig(configuration, new TestWebHostEnvironment());
+            .AddOpenIddictConfig(configuration, new TestWebHostEnvironment());
 
         using var provider = services.BuildServiceProvider();
         return provider.GetRequiredService<IOptionsMonitor<OpenIdConnectOptions>>().Get("oidc");
