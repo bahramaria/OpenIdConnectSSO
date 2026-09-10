@@ -38,7 +38,6 @@ services.ConfigureApplicationCookie(options =>
 });
 
 services.AddScoped<IDbInitializer, DbInitializer>();
-
 services.AddOpenIddictConfig(config, builder.Environment);
 
 var app = builder.Build();
@@ -69,9 +68,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -80,3 +77,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+public partial class Program
+{
+}
