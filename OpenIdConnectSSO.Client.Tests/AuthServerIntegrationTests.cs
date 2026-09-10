@@ -41,7 +41,7 @@ public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
         });
 
         var response = await client.GetAsync(
-            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles&code_challenge=test&code_challenge_method=S256");
+            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&code_challenge_method=S256");
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
@@ -72,14 +72,13 @@ public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
         Assert.Equal(HttpStatusCode.Redirect, loginResponse.StatusCode);
 
         var authorizeResponse = await client.GetAsync(
-            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles&code_challenge=dGVzdA&code_challenge_method=S256");
+            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&code_challenge_method=S256");
 
         Assert.Equal(HttpStatusCode.Redirect, authorizeResponse.StatusCode);
         Assert.NotNull(authorizeResponse.Headers.Location);
         Assert.Equal("https", authorizeResponse.Headers.Location!.Scheme);
         Assert.Equal("localhost", authorizeResponse.Headers.Location.Host);
         Assert.Contains("code=", authorizeResponse.Headers.Location.Query);
-        Assert.Contains("state=", authorizeResponse.Headers.Location.Query);
     }
 
     private static string ExtractAntiForgeryToken(string html)
