@@ -125,7 +125,7 @@ public class AuthorizationController : Controller
 
         if (scopes.Contains(OpenIddictConstants.Scopes.Roles))
         {
-            result[OpenIddictConstants.Claims.Roles] = User
+            result["roles"] = User
                 .FindAll(OpenIddictConstants.Claims.Role)
                 .Select(claim => claim.Value)
                 .Where(value => !string.IsNullOrWhiteSpace(value))
