@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenIdConnectSSO.AuthServer.Controllers;
 using OpenIddict.Abstractions;
 using System.Security.Claims;
+using Xunit;
 
 namespace OpenIdConnectSSO.Client.Tests;
 
