@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.AspNetCore.Identity;
 using OpenIdConnectSSO.Client.Controllers;
 using Xunit;
 
@@ -42,7 +42,7 @@ public class LoginFlowTests
             logger: NullLogger<AccountController>.Instance);
 
         controller.ControllerContext = new ControllerContext(
-            new ActionContext(httpContext, new RouteData(), controller));
+            new ActionContext(httpContext, new RouteData(), new ActionDescriptor()));
 
         return controller;
     }
