@@ -16,19 +16,13 @@ using Xunit;
 
 namespace OpenIdConnectSSO.Client.Tests;
 
-public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
+public class AuthServerIntegrationTests
 {
-    private readonly AuthServerFactory _factory;
-
-    public AuthServerIntegrationTests(AuthServerFactory factory)
-    {
-        _factory = factory;
-    }
-
     [Fact]
     public async Task LoginPage_ReturnsSuccess()
     {
-        using var client = _factory.CreateClient();
+        using var factory = new AuthServerFactory();
+        using var client = factory.CreateClient();
 
         var response = await client.GetAsync("/Account/Login");
 
@@ -38,7 +32,8 @@ public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
     [Fact]
     public async Task Authorize_WithoutLogin_RedirectsToLogin()
     {
-        using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        using var factory = new AuthServerFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false,
             BaseAddress = new Uri("https://localhost")
@@ -55,7 +50,8 @@ public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
     [Fact]
     public async Task Login_ThenAuthorize_ReturnsAuthorizationCodeRedirect()
     {
-        using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        using var factory = new AuthServerFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false,
             BaseAddress = new Uri("https://localhost")
@@ -89,7 +85,8 @@ public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
     [Fact]
     public async Task Login_ThenAuthorize_ThenToken_ThenUserInfo_Succeeds()
     {
-        using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        using var factory = new AuthServerFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false,
             BaseAddress = new Uri("https://localhost")
@@ -181,7 +178,8 @@ public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
     [Fact]
     public async Task Token_WithInvalidPkceVerifier_IsRejected()
     {
-        using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        using var factory = new AuthServerFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false,
             BaseAddress = new Uri("https://localhost")
@@ -256,6 +254,8 @@ public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
 
 public sealed class AuthServerFactory : WebApplicationFactory<Program>
 {
+    private readonly string _databaseName = $"AuthServerIntegrationTests-{Guid.NewGuid():N}";
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
@@ -267,7 +267,7 @@ public sealed class AuthServerFactory : WebApplicationFactory<Program>
 
             services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseInMemoryDatabase("AuthServerIntegrationTests");
+                options.UseInMemoryDatabase(_databaseName);
                 options.UseOpenIddict();
             });
         });
