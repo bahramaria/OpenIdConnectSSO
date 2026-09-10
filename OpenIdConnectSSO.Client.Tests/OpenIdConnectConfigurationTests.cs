@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIdConnectSSO.Client.Services;
 
+using Xunit;
+
 namespace OpenIdConnectSSO.Client.Tests;
 
 public class OpenIdConnectConfigurationTests
@@ -40,7 +42,7 @@ public class OpenIdConnectConfigurationTests
         Assert.True(options.GetClaimsFromUserInfoEndpoint);
         Assert.Equal(
             ["openid", "profile", "email", "roles"],
-            options.Scope.ToArray());
+            [.. options.Scope]);
     }
 
     private sealed class TestWebHostEnvironment : Microsoft.AspNetCore.Hosting.IWebHostEnvironment
