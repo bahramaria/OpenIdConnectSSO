@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -49,7 +50,7 @@ public class OidcErrorHandlingTests
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddAuthentication()
-            .AddOpenIddictConfig(configuration, new TestWebHostEnvironment());
+            .AddOpenIdConnectSSOConfig(configuration, new TestWebHostEnvironment());
 
         using var provider = services.BuildServiceProvider();
         return provider.GetRequiredService<IOptionsMonitor<OpenIdConnectOptions>>().Get("oidc");
