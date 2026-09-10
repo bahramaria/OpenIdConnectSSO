@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using OpenIdConnectSSO.Client.Controllers;
+using Xunit;
 
 namespace OpenIdConnectSSO.Client.Tests;
 
@@ -12,10 +14,6 @@ public class LoginFlowTests
     public void LoginWithSso_UsesOidcChallengeAndLocalReturnUrl()
     {
         var controller = CreateController();
-        controller.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext()
-        };
 
         var result = controller.LoginWithSso("/Orders");
 
@@ -28,10 +26,6 @@ public class LoginFlowTests
     public void LoginWithSso_UsesRootForExternalReturnUrl()
     {
         var controller = CreateController();
-        controller.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext()
-        };
 
         var result = controller.LoginWithSso("https://example.test/redirect");
 
@@ -39,9 +33,17 @@ public class LoginFlowTests
         Assert.Equal("/", challenge.Properties!.RedirectUri);
     }
 
-    private static AccountController CreateController() =>
-        new(
+    private static AccountController CreateController()
+    {
+        var httpContext = new DefaultHttpContext();
+        var controller = new AccountController(
             signInManager: null!,
             userManager: null!,
             logger: NullLogger<AccountController>.Instance);
+
+        controller.ControllerContext = new ControllerContext(
+            new ActionContext(httpContext, new RouteData(), controller));
+
+        return controller;
+    }
 }
