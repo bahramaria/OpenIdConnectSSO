@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -42,7 +41,10 @@ public class LoginFlowTests
             userManager: null!,
             logger: NullLogger<AccountController>.Instance);
 
-        controller.ControllerContext = new(new(httpContext, new(), new ControllerActionDescriptor()));
+        controller.ControllerContext = new ControllerContext(
+            new ActionContext(httpContext, new RouteData(), new ControllerActionDescriptor()));
+
+        controller.Url = new UrlHelper(controller.ControllerContext);
 
         return controller;
     }
