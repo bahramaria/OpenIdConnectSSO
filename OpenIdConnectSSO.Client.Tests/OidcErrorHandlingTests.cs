@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenIdConnectSSO.Client.Services;
+using Xunit;
 
 namespace OpenIdConnectSSO.Client.Tests;
 
