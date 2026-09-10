@@ -57,7 +57,7 @@ using (var scope = app.Services.CreateScope())
     var scopedServices = scope.ServiceProvider;
     var db = scopedServices.GetRequiredService<AppDbContext>();
 
-    if ((await db.Database.GetPendingMigrationsAsync()).Any())
+    if (db.Database.IsRelational() && (await db.Database.GetPendingMigrationsAsync()).Any())
     {
         await db.Database.MigrateAsync();
     }
