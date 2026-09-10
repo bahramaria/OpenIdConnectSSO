@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using OpenIdConnectSSO.AuthServer.Data;
@@ -33,6 +33,8 @@ services
 services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = ".AspNetCore.Identity.AuthServer";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
 services.AddScoped<IDbInitializer, DbInitializer>();
