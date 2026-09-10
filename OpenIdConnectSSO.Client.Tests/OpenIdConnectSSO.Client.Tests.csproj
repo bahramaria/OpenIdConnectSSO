@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenIdConnectSSO.Client\OpenIdConnectSSO.Client.csproj" />
+    <ProjectReference Include="..\OpenIdConnectSSO.AuthServer\OpenIdConnectSSO.AuthServer.csproj" />
   </ItemGroup>
 
 </Project>
