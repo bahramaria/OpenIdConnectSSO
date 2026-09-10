@@ -51,10 +51,6 @@ var app = builder.Build();
 
 using(var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ClientAppDbContext>();
-
-    await db.Database.MigrateAsync();
-
     var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
     await dbInitializer.InitializeAsync();
 }

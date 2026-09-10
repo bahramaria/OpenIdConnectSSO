@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 using OpenIdConnectSSO.Client.Data;
 
 namespace OpenIdConnectSSO.Client.Services;
-
-#pragma warning disable CS9113 // Parameter is unread.
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously.
 
 public interface IDbInitializer
 {
@@ -20,6 +18,10 @@ public class DbInitializer(
 {
     public async Task InitializeAsync()
     {
+        await db.Database.MigrateAsync();
+
+        // Seed data...
+
         //if (!await roleManager.RoleExistsAsync("Admin"))
         //{
         //    await roleManager.CreateAsync(new IdentityRole("Admin"));
@@ -33,6 +35,3 @@ public class DbInitializer(
         //}
     }
 }
-
-#pragma warning restore CS9113 // Parameter is unread.
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously

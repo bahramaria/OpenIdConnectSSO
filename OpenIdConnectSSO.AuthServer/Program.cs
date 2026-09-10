@@ -54,15 +54,7 @@ else
 
 using (var scope = app.Services.CreateScope())
 {
-    var scopedServices = scope.ServiceProvider;
-    var db = scopedServices.GetRequiredService<AppDbContext>();
-
-    if (db.Database.IsRelational() && (await db.Database.GetPendingMigrationsAsync()).Any())
-    {
-        await db.Database.MigrateAsync();
-    }
-
-    var dbInitializer = scopedServices.GetRequiredService<IDbInitializer>();
+    var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
     await dbInitializer.InitializeAsync();
 }
 

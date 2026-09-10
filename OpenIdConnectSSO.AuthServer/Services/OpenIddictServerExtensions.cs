@@ -24,7 +24,7 @@ public static class OpenIddictServerExtensions
 
                 options.SetAuthorizationEndpointUris("/connect/authorize");
                 options.SetTokenEndpointUris("/connect/token");
-                options.SetUserinfoEndpointUris("/connect/userinfo");
+                options.SetUserInfoEndpointUris("/connect/userinfo");
 
                 options.RegisterScopes(
                     OpenIddictConstants.Scopes.OpenId,
@@ -38,7 +38,7 @@ public static class OpenIddictServerExtensions
 
                 options.UseAspNetCore()
                        .EnableAuthorizationEndpointPassthrough()
-                       .EnableUserinfoEndpointPassthrough()
+                       .EnableUserInfoEndpointPassthrough()
                        .EnableStatusCodePagesIntegration();
 
                 options.AllowRefreshTokenFlow();

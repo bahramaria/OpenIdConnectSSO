@@ -12,15 +12,15 @@ using OpenIdConnectSSO.Client.Data;
 namespace OpenIdConnectSSO.Client.Migrations
 {
     [DbContext(typeof(ClientAppDbContext))]
-    [Migration("20260414195952_InitCreate")]
-    partial class InitCreate
+    [Migration("20260910161729_InitMigration")]
+    partial class InitMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.24")
+                .HasAnnotation("ProductVersion", "9.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
