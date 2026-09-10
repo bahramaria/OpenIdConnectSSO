@@ -1,13 +1,14 @@
-using System.Net;
-using System.Text.RegularExpressions;
-
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 using OpenIdConnectSSO.AuthServer.Data;
+
+using System.Net;
+using System.Text.RegularExpressions;
 
 using Xunit;
 
@@ -37,7 +38,8 @@ public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
     {
         using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
         {
-            AllowAutoRedirect = false
+            AllowAutoRedirect = false,
+            BaseAddress = new Uri("https://localhost")
         });
 
         var response = await client.GetAsync(
@@ -53,7 +55,8 @@ public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
     {
         using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
         {
-            AllowAutoRedirect = false
+            AllowAutoRedirect = false,
+            BaseAddress = new Uri("https://localhost")
         });
 
         var loginPage = await client.GetStringAsync("/Account/Login");
@@ -98,9 +101,12 @@ public sealed class AuthServerFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
+
         builder.ConfigureServices(services =>
         {
+            services.RemoveAll<IDbContextOptionsConfiguration<AppDbContext>>();
             services.RemoveAll<DbContextOptions<AppDbContext>>();
+
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseInMemoryDatabase("AuthServerIntegrationTests");

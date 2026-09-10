@@ -18,7 +18,10 @@ public class DbInitializer(
 {
     public async Task InitializeAsync()
     {
-        await db.Database.MigrateAsync();
+        if (db.Database.IsRelational() && (await db.Database.GetPendingMigrationsAsync()).Any())
+        {
+            await db.Database.MigrateAsync();
+        }
 
         // Seed data...
 
