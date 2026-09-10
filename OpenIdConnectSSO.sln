@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenIdConnectSSO.Client", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenIdConnectSSO.Common", "OpenIdConnectSSO.Common\OpenIdConnectSSO.Common.csproj", "{B94A7369-53E7-4EAC-8875-9E3F902D37CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenIdConnectSSO.Client.Tests", "OpenIdConnectSSO.Client.Tests\OpenIdConnectSSO.Client.Tests.csproj", "{8E9D2E18-4F3D-4B13-9E9D-2C8A8D7A5A11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,16 +19,21 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{366F9CCB-0070-4A90-BCE9-61E5C8659358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{366F9CCB-0070-4A90-BCE9-61E5C8659358}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{366F9CCB-0070-4A90-BCE9-61E5C8659358}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{366F9CCB-0070-4A90-BCE9-61E5C8659358}.Release|Any CPU.Build.0 = Release|Any CPU
+		{366F4ADD-306F-481B-878B-A6EA3DCAE78B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F20F4ADD-306F-481B-878B-A6EA3DCAE78B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F20F4ADD-306F-481B-878B-A6EA3DCAE78B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{366F9CCB-0070-4A90-BCE9-61E5C8659358}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{366F9CCB-0070-4A90-BCE9-61E5C8659358}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F20F4ADD-306F-481B-878B-A6EA3DCAE78B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F20F4ADD-306F-481B-878B-A6EA3DCAE78B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B94A7369-53E7-4EAC-8875-9E3F902D37CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B94A7369-53E7-4EAC-8875-9E3F902D37CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B94A7369-53E7-4EAC-8875-9E3F902D37CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B94A7369-53E7-4EAC-8875-9E3F902D37CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E9D2E18-4F3D-4B13-9E9D-2C8A8D7A5A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E9D2E18-4F3D-4B13-9E9D-2C8A8D7A5A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E9D2E18-4F3D-4B13-9E9D-2C8A8D7A5A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E9D2E18-4F3D-4B13-9E9D-2C8A8D7A5A11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
