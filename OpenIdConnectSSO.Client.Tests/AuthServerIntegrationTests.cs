@@ -162,6 +162,70 @@ public class AuthServerIntegrationTests : IClassFixture<AuthServerFactory>
         Assert.Contains(
             "Admin",
             userInfoRoot.GetProperty("roles").EnumerateArray().Select(element => element.GetString()));
+
+        using var replayTokenForm = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["grant_type"] = "authorization_code",
+            ["client_id"] = "sampleclient",
+            ["client_secret"] = "very long client secret!!!",
+            ["code"] = code!,
+            ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+            ["code_verifier"] = codeVerifier
+        });
+
+        var replayResponse = await client.PostAsync("/connect/token", replayTokenForm);
+
+        Assert.Equal(HttpStatusCode.BadRequest, replayResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task Token_WithInvalidPkceVerifier_IsRejected()
+    {
+        using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false,
+            BaseAddress = new Uri("https://localhost")
+        });
+
+        var loginPage = await client.GetStringAsync("/Account/Login");
+        var antiForgeryToken = ExtractAntiForgeryToken(loginPage);
+
+        using var loginForm = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["Username"] = "Admin",
+            ["Password"] = "123456",
+            ["IsPersistent"] = "false",
+            ["__RequestVerificationToken"] = antiForgeryToken
+        });
+
+        var loginResponse = await client.PostAsync("/Account/Login", loginForm);
+        Assert.Equal(HttpStatusCode.Redirect, loginResponse.StatusCode);
+
+        const string codeVerifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+        const string codeChallenge = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
+
+        var authorizeResponse = await client.GetAsync(
+            $"/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles&code_challenge={codeChallenge}&code_challenge_method=S256");
+
+        Assert.Equal(HttpStatusCode.Redirect, authorizeResponse.StatusCode);
+        Assert.NotNull(authorizeResponse.Headers.Location);
+
+        var code = GetQueryParameter(authorizeResponse.Headers.Location!, "code");
+        Assert.False(string.IsNullOrWhiteSpace(code));
+
+        using var tokenForm = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["grant_type"] = "authorization_code",
+            ["client_id"] = "sampleclient",
+            ["client_secret"] = "very long client secret!!!",
+            ["code"] = code!,
+            ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+            ["code_verifier"] = "wrong-code-verifier"
+        });
+
+        var tokenResponse = await client.PostAsync("/connect/token", tokenForm);
+
+        Assert.Equal(HttpStatusCode.BadRequest, tokenResponse.StatusCode);
     }
 
     private static string ExtractAntiForgeryToken(string html)
