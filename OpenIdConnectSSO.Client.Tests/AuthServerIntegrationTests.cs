@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -137,7 +138,7 @@ public class AuthServerIntegrationTests
         Assert.Equal(HttpStatusCode.Redirect, loginResponse.StatusCode);
 
         var response = await client.GetAsync(
-            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile");
+            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&code_challenge_method=S256");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -348,6 +349,18 @@ public sealed class AuthServerFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
+
+        builder.ConfigureAppConfiguration((_, configuration) =>
+        {
+            configuration.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Oidc:EncryptionKey:Password"] = "123456789",
+                ["Seed:Users:AdminPassword"] = "123456",
+                ["Seed:Users:EmployeePassword"] = "123456",
+                ["Seed:Clients:SampleClientSecret"] = "very long client secret!!!",
+                ["Seed:Clients:GatewayClientSecret"] = "very long client secret!!!"
+            });
+        });
 
         builder.ConfigureServices(services =>
         {
