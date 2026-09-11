@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using OpenIdConnectSSO.AuthServer.Data;
 
 using OpenIddict.Abstractions;
-
-using System.Threading.Tasks;
 
 namespace OpenIdConnectSSO.AuthServer.Services;
 
@@ -19,7 +17,8 @@ public class DbInitializer(
     IOpenIddictScopeManager scopeManager,
     UserManager<IdentityUser> userManager,
     RoleManager<IdentityRole> roleManager,
-    AppDbContext db
+    AppDbContext db,
+    IConfiguration config
     ) : IDbInitializer
 {
     public async Task InitializeAsync()
@@ -35,8 +34,15 @@ public class DbInitializer(
 
     private async Task SeedUsersAsync()
     {
-        await CreateRoleAsync(role: "Admin", sampleUsername: "Admin", samplePassword: "123456");
-        await CreateRoleAsync(role: "Employee", sampleUsername: "Employee1", samplePassword: "123456");
+        await CreateRoleAsync(
+            role: "Admin",
+            sampleUsername: "Admin",
+            samplePassword: GetRequiredConfiguration("Seed:Users:AdminPassword"));
+
+        await CreateRoleAsync(
+            role: "Employee",
+            sampleUsername: "Employee1",
+            samplePassword: GetRequiredConfiguration("Seed:Users:EmployeePassword"));
     }
 
     private async Task SeedOpenIdAsync()
@@ -102,13 +108,13 @@ public class DbInitializer(
     {
         await CreateClientAsync(
             clientId: "sampleclient",
-            clientSecret: "very long client secret!!!",
+            clientSecret: GetRequiredConfiguration("Seed:Clients:SampleClientSecret"),
             displayName: "Sample Client",
             replace: false);
 
         await CreateClientAsync(
             clientId: "gateway_client_id",
-            clientSecret: "very long client secret!!!",
+            clientSecret: GetRequiredConfiguration("Seed:Clients:GatewayClientSecret"),
             displayName: "Gateway Client",
             redirectUri: "https://localhost:7002/getway-test.html",
             replace: false);
@@ -151,5 +157,11 @@ public class DbInitializer(
         };
 
         await applicationManager.CreateAsync(descriptor);
+    }
+
+    private string GetRequiredConfiguration(string key)
+    {
+        return config[key] ?? throw new InvalidOperationException(
+            $"Required configuration '{key}' was not found. Configure it using user secrets or environment variables.");
     }
 }
