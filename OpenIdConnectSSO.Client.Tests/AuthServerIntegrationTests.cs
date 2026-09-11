@@ -349,18 +349,11 @@ public sealed class AuthServerFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
-
-        builder.ConfigureAppConfiguration((_, configuration) =>
-        {
-            configuration.AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["Oidc:EncryptionKey:Password"] = "123456789",
-                ["Seed:Users:AdminPassword"] = "123456",
-                ["Seed:Users:EmployeePassword"] = "123456",
-                ["Seed:Clients:SampleClientSecret"] = "very long client secret!!!",
-                ["Seed:Clients:GatewayClientSecret"] = "very long client secret!!!"
-            });
-        });
+        builder.UseSetting("Oidc:EncryptionKey:Password", "123456789");
+        builder.UseSetting("Seed:Users:AdminPassword", "123456");
+        builder.UseSetting("Seed:Users:EmployeePassword", "123456");
+        builder.UseSetting("Seed:Clients:SampleClientSecret", "very long client secret!!!");
+        builder.UseSetting("Seed:Clients:GatewayClientSecret", "very long client secret!!!");
 
         builder.ConfigureServices(services =>
         {
