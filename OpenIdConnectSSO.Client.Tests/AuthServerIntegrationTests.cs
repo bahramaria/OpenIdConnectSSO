@@ -83,6 +83,95 @@ public class AuthServerIntegrationTests
     }
 
     [Fact]
+    public async Task Authorize_WithInvalidRedirectUri_IsRejected()
+    {
+        using var factory = new AuthServerFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false,
+            BaseAddress = new Uri("https://localhost")
+        });
+
+        var loginPage = await client.GetStringAsync("/Account/Login");
+        var antiForgeryToken = ExtractAntiForgeryToken(loginPage);
+
+        using var loginForm = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["Username"] = "Admin",
+            ["Password"] = "123456",
+            ["IsPersistent"] = "false",
+            ["__RequestVerificationToken"] = antiForgeryToken
+        });
+
+        var loginResponse = await client.PostAsync("/Account/Login", loginForm);
+        Assert.Equal(HttpStatusCode.Redirect, loginResponse.StatusCode);
+
+        var response = await client.GetAsync(
+            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Fevil.example%2Fcallback&scope=openid%20profile&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&code_challenge_method=S256");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Authorize_WithoutPkce_IsRejected()
+    {
+        using var factory = new AuthServerFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false,
+            BaseAddress = new Uri("https://localhost")
+        });
+
+        var loginPage = await client.GetStringAsync("/Account/Login");
+        var antiForgeryToken = ExtractAntiForgeryToken(loginPage);
+
+        using var loginForm = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["Username"] = "Admin",
+            ["Password"] = "123456",
+            ["IsPersistent"] = "false",
+            ["__RequestVerificationToken"] = antiForgeryToken
+        });
+
+        var loginResponse = await client.PostAsync("/Account/Login", loginForm);
+        Assert.Equal(HttpStatusCode.Redirect, loginResponse.StatusCode);
+
+        var response = await client.GetAsync(
+            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Token_WithUnknownClient_IsRejected()
+    {
+        using var factory = new AuthServerFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false,
+            BaseAddress = new Uri("https://localhost")
+        });
+
+        using var tokenForm = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["grant_type"] = "authorization_code",
+            ["client_id"] = "unknown-client",
+            ["client_secret"] = "invalid-secret",
+            ["code"] = "invalid-code",
+            ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+            ["code_verifier"] = "invalid-verifier"
+        });
+
+        var response = await client.PostAsync("/connect/token", tokenForm);
+        var payload = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+
+        using var json = JsonDocument.Parse(payload);
+        Assert.Equal("invalid_client", json.RootElement.GetProperty("error").GetString());
+    }
+
+    [Fact]
     public async Task Login_ThenAuthorize_ThenToken_ThenUserInfo_Succeeds()
     {
         using var factory = new AuthServerFactory();
