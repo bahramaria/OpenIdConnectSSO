@@ -74,11 +74,37 @@ Update the connection string in `appsettings.json` for both AuthServer and Clien
 }
 ```
 
-### 3. Apply Database Migrations
+### 3. Configure Development Secrets
+
+Passwords, client secrets, and the encrypted OIDC key password are not stored in the repository. Configure them with ASP.NET Core User Secrets for local development.
+
+**Auth Server:**
+```bash
+cd OpenIdConnectSSO.AuthServer
+
+dotnet user-secrets set "Oidc:EncryptionKey:Password" "<your-key-password>"
+dotnet user-secrets set "Seed:Users:AdminPassword" "<admin-password>"
+dotnet user-secrets set "Seed:Users:EmployeePassword" "<employee-password>"
+dotnet user-secrets set "Seed:Clients:SampleClientSecret" "<sample-client-secret>"
+dotnet user-secrets set "Seed:Clients:GatewayClientSecret" "<gateway-client-secret>"
+```
+
+**Client:**
+```bash
+cd ../OpenIdConnectSSO.Client
+
+dotnet user-secrets set "Oidc:ClientSecret" "<sample-client-secret>"
+```
+
+The `Seed:Clients:SampleClientSecret` value on the Auth Server must match `Oidc:ClientSecret` on the Client.
+
+For production, provide these values through the deployment environment's secret-management mechanism rather than committing them to configuration files.
+
+### 4. Apply Database Migrations
 
 ```bash
 # Auth Server Database
-cd OpenIdConnectSSO.AuthServer
+cd ../OpenIdConnectSSO.AuthServer
 dotnet ef database update
 
 # Client Database
@@ -86,7 +112,7 @@ cd ../OpenIdConnectSSO.Client
 dotnet ef database update
 ```
 
-### 4. Build and Run
+### 5. Build and Run
 
 #### Option A: Run from Visual Studio
 1. Open `OpenIdConnectSSO.sln` in Visual Studio
@@ -131,6 +157,7 @@ dotnet test OpenIdConnectSSO.sln --verbosity normal
 - **HTTPS Enforcement**: Automatic HTTPS redirection
 - **Token Validation**: Comprehensive token validation
 - **Error Handling**: Secure error messages without leaking sensitive information
+- **Secret Management**: Development secrets are stored outside the repository using ASP.NET Core User Secrets
 
 ## 📦 Project Structure
 
@@ -241,7 +268,7 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 ## 🙏 Acknowledgments
 
 - [OpenIddict Documentation](https://documentation.openiddict.com/)
-- [ASP.NET Core Identity](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity)
+- [ASP.NET Core Identity](https://docs.microsoft.com/en-us/aspnet/core/security/identity)
 - [OpenID Connect Protocol](https://openid.net/connect/)
 
 ---
