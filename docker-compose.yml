@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  authserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: authserver-runtime
+    container_name: oidc-authserver
+    ports:
+      - "7001:8080"
+      - "7002:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+      - ConnectionStrings__DefaultConnection=Server=db;Database=OpenIdConnectSSO_Auth;User Id=sa;Password=Your_password123;TrustServerCertificate=True;
+    depends_on:
+      - db
+    networks:
+      - oidc-network
+    restart: unless-stopped
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: client-runtime
+    container_name: oidc-client
+    ports:
+      - "7003:8082"
+      - "7004:8083"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8082;https://+:8083
+      - ConnectionStrings__DefaultConnection=Server=db;Database=OpenIdConnectSSO_Client;User Id=sa;Password=Your_password123;TrustServerCertificate=True;
+      - SsoSettings__AuthServerUrl=https://localhost:7002
+    depends_on:
+      - db
+    networks:
+      - oidc-network
+    restart: unless-stopped
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: oidc-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Your_password123
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - oidc-network
+    restart: unless-stopped
+
+networks:
+  oidc-network:
+    driver: bridge
+
+volumes:
+  sql_data:
