@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 
 using System.Net;
+using System.Text.Json;
 
 using Xunit;
 
@@ -35,7 +36,15 @@ public sealed class TokenRequestValidationTests : IClassFixture<AuthServerFactor
 
         var response = await client.PostAsync("/connect/token", form);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+
+        var payload = await response.Content.ReadAsStringAsync();
+
+        using var json = JsonDocument.Parse(payload);
+
+        Assert.Equal(
+            "invalid_client",
+            json.RootElement.GetProperty("error").GetString());
     }
 
     [Fact]

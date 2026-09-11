@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.WebUtilities;
 
 using System.Net;
 
@@ -6,26 +7,28 @@ using Xunit;
 
 namespace OpenIdConnectSSO.Client.Tests;
 
-public sealed class AuthorizationRequestValidationTests : IClassFixture<AuthServerFactory>
+public sealed class AuthorizationRequestValidationTests(AuthServerFactory factory) : IClassFixture<AuthServerFactory>
 {
-    private readonly AuthServerFactory _factory;
-
-    public AuthorizationRequestValidationTests(AuthServerFactory factory)
-    {
-        _factory = factory;
-    }
-
     [Fact]
     public async Task Authorize_WithUnknownClient_IsRejected()
     {
-        using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false,
             BaseAddress = new Uri("https://localhost")
         });
 
-        var response = await client.GetAsync(
-            "/connect/authorize?client_id=unknown-client&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles");
+        string authorizeUrl = QueryHelpers.AddQueryString(
+            "/connect/authorize",
+            new Dictionary<string, string?>
+            {
+                ["client_id"] = "unknown-client",
+                ["response_type"] = "code",
+                ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+                ["scope"] = "openid profile email roles"
+            });
+
+        var response = await client.GetAsync(authorizeUrl);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Null(response.Headers.Location);
@@ -34,14 +37,23 @@ public sealed class AuthorizationRequestValidationTests : IClassFixture<AuthServ
     [Fact]
     public async Task Authorize_WithUnregisteredRedirectUri_IsRejected()
     {
-        using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false,
             BaseAddress = new Uri("https://localhost")
         });
 
-        var response = await client.GetAsync(
-            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Fevil.example%2Fcallback&scope=openid%20profile%20email%20roles");
+        string authorizeUrl = QueryHelpers.AddQueryString(
+            "/connect/authorize",
+            new Dictionary<string, string?>
+            {
+                ["client_id"] = "sampleclient",
+                ["response_type"] = "code",
+                ["redirect_uri"] = "https://evil.example/callback",
+                ["scope"] = "openid profile email roles"
+            });
+
+        var response = await client.GetAsync(authorizeUrl);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Null(response.Headers.Location);
@@ -50,14 +62,23 @@ public sealed class AuthorizationRequestValidationTests : IClassFixture<AuthServ
     [Fact]
     public async Task Authorize_WithUnpermittedScope_IsRejected()
     {
-        using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false,
             BaseAddress = new Uri("https://localhost")
         });
 
-        var response = await client.GetAsync(
-            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles%20not_allowed_scope");
+        string authorizeUrl = QueryHelpers.AddQueryString(
+            "/connect/authorize",
+            new Dictionary<string, string?>
+            {
+                ["client_id"] = "sampleclient",
+                ["response_type"] = "code",
+                ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+                ["scope"] = "openid profile email roles not_allowed_scope"
+            });
+
+        var response = await client.GetAsync(authorizeUrl);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Null(response.Headers.Location);
@@ -66,14 +87,23 @@ public sealed class AuthorizationRequestValidationTests : IClassFixture<AuthServ
     [Fact]
     public async Task Authorize_WithUnpermittedResponseType_IsRejected()
     {
-        using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false,
             BaseAddress = new Uri("https://localhost")
         });
 
-        var response = await client.GetAsync(
-            "/connect/authorize?client_id=sampleclient&response_type=token&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles");
+        string authorizeUrl = QueryHelpers.AddQueryString(
+            "/connect/authorize",
+            new Dictionary<string, string?>
+            {
+                ["client_id"] = "sampleclient",
+                ["response_type"] = "token",
+                ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+                ["scope"] = "openid profile email roles"
+            });
+
+        var response = await client.GetAsync(authorizeUrl);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Null(response.Headers.Location);
