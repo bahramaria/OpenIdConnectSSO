@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using OpenIdConnectSSO.AuthServer.Data;
@@ -33,10 +33,11 @@ services
 services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = ".AspNetCore.Identity.AuthServer";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
 services.AddScoped<IDbInitializer, DbInitializer>();
-
 services.AddOpenIddictConfig(config, builder.Environment);
 
 var app = builder.Build();
@@ -53,23 +54,13 @@ else
 
 using (var scope = app.Services.CreateScope())
 {
-    var scopedServices = scope.ServiceProvider;
-    var db = scopedServices.GetRequiredService<AppDbContext>();
-
-    if ((await db.Database.GetPendingMigrationsAsync()).Any())
-    {
-        await db.Database.MigrateAsync();
-    }
-
-    var dbInitializer = scopedServices.GetRequiredService<IDbInitializer>();
+    var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
     await dbInitializer.InitializeAsync();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -78,3 +69,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+public partial class Program
+{
+}

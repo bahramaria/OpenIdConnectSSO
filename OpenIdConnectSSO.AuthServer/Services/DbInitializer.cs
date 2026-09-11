@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+using OpenIdConnectSSO.AuthServer.Data;
 
 using OpenIddict.Abstractions;
 
@@ -15,11 +18,17 @@ public class DbInitializer(
     IOpenIddictApplicationManager applicationManager,
     IOpenIddictScopeManager scopeManager,
     UserManager<IdentityUser> userManager,
-    RoleManager<IdentityRole> roleManager
+    RoleManager<IdentityRole> roleManager,
+    AppDbContext db
     ) : IDbInitializer
 {
     public async Task InitializeAsync()
     {
+        if (db.Database.IsRelational() && (await db.Database.GetPendingMigrationsAsync()).Any())
+        {
+            await db.Database.MigrateAsync();
+        }
+
         await SeedUsersAsync();
         await SeedOpenIdAsync();
     }
@@ -70,7 +79,7 @@ public class DbInitializer(
         {
             IdentityUser user = new() { UserName = sampleUsername };
             await userManager.CreateAsync(user, samplePassword);
-            await userManager.AddToRoleAsync(user, sampleUsername);
+            await userManager.AddToRoleAsync(user, role);
         }
     }
 

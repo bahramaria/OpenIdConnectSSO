@@ -12,15 +12,15 @@ using OpenIdConnectSSO.AuthServer.Data;
 namespace OpenIdConnectSSO.AuthServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260414134753_OpenIdDict")]
-    partial class OpenIdDict
+    [Migration("20260910161743_InitMigration")]
+    partial class InitMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.24")
+                .HasAnnotation("ProductVersion", "9.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -229,12 +229,20 @@ namespace OpenIdConnectSSO.AuthServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ApplicationType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("ClientId")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ClientSecret")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsConcurrencyToken()
@@ -249,6 +257,9 @@ namespace OpenIdConnectSSO.AuthServer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DisplayNames")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JsonWebKeySet")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Permissions")
@@ -266,9 +277,8 @@ namespace OpenIdConnectSSO.AuthServer.Migrations
                     b.Property<string>("Requirements")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Type")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<string>("Settings")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -408,8 +418,8 @@ namespace OpenIdConnectSSO.AuthServer.Migrations
                         .HasColumnType("nvarchar(400)");
 
                     b.Property<string>("Type")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.HasKey("Id");
 

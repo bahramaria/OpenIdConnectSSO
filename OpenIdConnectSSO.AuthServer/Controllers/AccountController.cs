@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using OpenIdConnectSSO.AuthServer.ViewModels;
@@ -14,6 +14,7 @@ public class AccountController(
     public IActionResult Login() => View();
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel loginViewModel, string? returnUrl)
     {
         if (!ModelState.IsValid)
@@ -28,13 +29,13 @@ public class AccountController(
             return View(loginViewModel);
         }
 
-        var resutl = await signInManager.PasswordSignInAsync(
+        var result = await signInManager.PasswordSignInAsync(
             userName: loginViewModel.Username,
             password: loginViewModel.Password,
             isPersistent: loginViewModel.IsPersistent,
             lockoutOnFailure: false);
 
-        if (!resutl.Succeeded)
+        if (!result.Succeeded)
         {
             ModelState.AddModelError("", "Invalid username or password.");
             return View(loginViewModel);
@@ -44,7 +45,6 @@ public class AccountController(
             ? (IActionResult)LocalRedirect(returnUrl)
             : RedirectToAction("Index", "Home");
     }
-
 
     [HttpGet]
     public async Task<IActionResult> Logout()

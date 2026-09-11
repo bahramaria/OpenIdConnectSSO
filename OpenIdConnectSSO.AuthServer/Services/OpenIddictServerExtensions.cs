@@ -1,11 +1,8 @@
-﻿using Microsoft.IdentityModel.Tokens;
-
+using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
-
 using System.Security.Cryptography;
-
-using OpenIdConnectSSO.Common;
 using OpenIdConnectSSO.AuthServer.Data;
+using OpenIdConnectSSO.Common;
 
 namespace OpenIdConnectSSO.AuthServer.Services;
 
@@ -22,15 +19,12 @@ public static class OpenIddictServerExtensions
             })
             .AddServer(options =>
             {
-                // فعال کردن Authorization Code Flow
                 options.AllowAuthorizationCodeFlow()
                        .RequireProofKeyForCodeExchange();
 
-                // مسیرهای استاندارد
                 options.SetAuthorizationEndpointUris("/connect/authorize");
                 options.SetTokenEndpointUris("/connect/token");
-                options.SetUserinfoEndpointUris("/connect/userinfo");
-                //options.SetLogoutEndpointUris("/connect/logout");
+                options.SetUserInfoEndpointUris("/connect/userinfo");
 
                 options.RegisterScopes(
                     OpenIddictConstants.Scopes.OpenId,
@@ -38,50 +32,52 @@ public static class OpenIddictServerExtensions
                     OpenIddictConstants.Scopes.Email,
                     OpenIddictConstants.Scopes.Roles);
 
-                // کلیدهای امضای Token  
-                // برای محیط dev
-                //options.AddDevelopmentEncryptionCertificate()
-                //       .AddDevelopmentSigningCertificate();
-
-                var rsaSecurityKey = CreateRsaSeruciryKey(config, env);
+                var rsaSecurityKey = CreateRsaSecurityKey(config, env);
                 options.AddSigningKey(rsaSecurityKey);
                 options.AddEncryptionKey(rsaSecurityKey);
 
-                // ادغام با ASP.NET Core (مهم)
                 options.UseAspNetCore()
                        .EnableAuthorizationEndpointPassthrough()
-                       .EnableUserinfoEndpointPassthrough()
-                       //.EnableTokenEndpointPassthrough()
-                       //.EnableLogoutEndpointPassthrough()
-                       .EnableStatusCodePagesIntegration()
-                       ;
+                       .EnableUserInfoEndpointPassthrough()
+                       .EnableStatusCodePagesIntegration();
 
-                // انتخاب فرمت توکن
                 options.AllowRefreshTokenFlow();
             })
             .AddValidation(options =>
             {
-                // اگر همین اپ خودش SSO Server و Resource Server است:
                 options.UseLocalServer();
                 options.UseAspNetCore();
             });
     }
 
-    public static RsaSecurityKey CreateRsaSeruciryKey(IConfiguration config, IWebHostEnvironment env)
+    public static RsaSecurityKey CreateRsaSecurityKey(IConfiguration config, IWebHostEnvironment env)
     {
-        string encryptionKeyUrl = config.GetValue<string>("Oidc:EncryptionKey:Url")!;
-        string keyPath = Path.Combine(env.MapPath(encryptionKeyUrl));
+        var encryptionKeyUrl = config["Oidc:EncryptionKey:Url"];
+        if (string.IsNullOrWhiteSpace(encryptionKeyUrl))
+        {
+            throw new InvalidOperationException("OIDC encryption key path is not configured.");
+        }
 
-        string encryptionKeyPassword = config.GetValue<string>("Oidc:EncryptionKey:Password")!;
+        var encryptionKeyPassword = config["Oidc:EncryptionKey:Password"];
+        if (string.IsNullOrWhiteSpace(encryptionKeyPassword))
+        {
+            throw new InvalidOperationException("OIDC encryption key password is not configured.");
+        }
 
-        var key = RSA.Create();
+        var keyPath = Path.Combine(env.MapPath(encryptionKeyUrl));
+        if (!File.Exists(keyPath))
+        {
+            throw new FileNotFoundException("OIDC encryption key file was not found.", keyPath);
+        }
+
+        using var key = RSA.Create();
         key.ImportFromEncryptedPem(File.ReadAllText(keyPath), encryptionKeyPassword);
-        return new RsaSecurityKey(key)!;
-    }
-}
 
-public interface IOpenIddictServerService
-{
-    void AddOpenIddictConfig();
-    RsaSecurityKey CreateRsaSeruciryKey();
+        if (key.KeySize < 2048)
+        {
+            throw new InvalidOperationException("The OIDC RSA key must be at least 2048 bits.");
+        }
+
+        return new RsaSecurityKey(key.ExportParameters(true));
+    }
 }
