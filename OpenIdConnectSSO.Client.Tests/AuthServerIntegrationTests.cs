@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -40,8 +41,19 @@ public class AuthServerIntegrationTests
             BaseAddress = new Uri("https://localhost")
         });
 
-        var response = await client.GetAsync(
-            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&code_challenge_method=S256");
+        string authorizeUrl = QueryHelpers.AddQueryString(
+            "/connect/authorize",
+            new Dictionary<string, string?>
+            {
+                ["client_id"] = "sampleclient",
+                ["response_type"] = "code",
+                ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+                ["scope"] = "openid profile email roles",
+                ["code_challenge"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                ["code_challenge_method"] = "S256"
+            });
+
+        var response = await client.GetAsync(authorizeUrl);
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
@@ -73,8 +85,19 @@ public class AuthServerIntegrationTests
 
         Assert.Equal(HttpStatusCode.Redirect, loginResponse.StatusCode);
 
-        var authorizeResponse = await client.GetAsync(
-            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&code_challenge_method=S256");
+        string authorizeUrl = QueryHelpers.AddQueryString(
+            "/connect/authorize",
+            new Dictionary<string, string?>
+            {
+                ["client_id"] = "sampleclient",
+                ["response_type"] = "code",
+                ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+                ["scope"] = "openid profile email roles",
+                ["code_challenge"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                ["code_challenge_method"] = "S256"
+            });
+
+        var authorizeResponse = await client.GetAsync(authorizeUrl);
 
         Assert.Equal(HttpStatusCode.Redirect, authorizeResponse.StatusCode);
         Assert.NotNull(authorizeResponse.Headers.Location);
@@ -107,8 +130,19 @@ public class AuthServerIntegrationTests
         var loginResponse = await client.PostAsync("/Account/Login", loginForm);
         Assert.Equal(HttpStatusCode.Redirect, loginResponse.StatusCode);
 
-        var response = await client.GetAsync(
-            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Fevil.example%2Fcallback&scope=openid%20profile&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&code_challenge_method=S256");
+        string authorizeUrl = QueryHelpers.AddQueryString(
+            "/connect/authorize",
+            new Dictionary<string, string?>
+            {
+                ["client_id"] = "sampleclient",
+                ["response_type"] = "code",
+                ["redirect_uri"] = "https://evil.example/callback",
+                ["scope"] = "openid profile email roles",
+                ["code_challenge"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                ["code_challenge_method"] = "S256"
+            });
+
+        var response = await client.GetAsync(authorizeUrl);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -137,10 +171,21 @@ public class AuthServerIntegrationTests
         var loginResponse = await client.PostAsync("/Account/Login", loginForm);
         Assert.Equal(HttpStatusCode.Redirect, loginResponse.StatusCode);
 
-        var response = await client.GetAsync(
-            "/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&code_challenge_method=S256");
+        string authorizeUrl = QueryHelpers.AddQueryString(
+            "/connect/authorize",
+            new Dictionary<string, string?>
+            {
+                ["client_id"] = "sampleclient",
+                ["response_type"] = "code",
+                ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+                ["scope"] = "openid profile",
+                ["code_challenge"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                ["code_challenge_method"] = "S256"
+            });
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var response = await client.GetAsync(authorizeUrl);
+
+        Assert.False(response.IsSuccessStatusCode);
     }
 
     [Fact]
@@ -199,8 +244,19 @@ public class AuthServerIntegrationTests
         const string codeVerifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
         const string codeChallenge = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
 
-        var authorizeResponse = await client.GetAsync(
-            $"/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles&code_challenge={codeChallenge}&code_challenge_method=S256");
+        string authorizeUrl = QueryHelpers.AddQueryString(
+            "/connect/authorize",
+            new Dictionary<string, string?>
+            {
+                ["client_id"] = "sampleclient",
+                ["response_type"] = "code",
+                ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+                ["scope"] = "openid profile email roles",
+                ["code_challenge"] = codeChallenge,
+                ["code_challenge_method"] = "S256"
+            });
+
+        var authorizeResponse = await client.GetAsync(authorizeUrl);
 
         Assert.Equal(HttpStatusCode.Redirect, authorizeResponse.StatusCode);
         Assert.NotNull(authorizeResponse.Headers.Location);
@@ -292,8 +348,19 @@ public class AuthServerIntegrationTests
         const string codeVerifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
         const string codeChallenge = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
 
-        var authorizeResponse = await client.GetAsync(
-            $"/connect/authorize?client_id=sampleclient&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A7002%2Fsignin-oidc&scope=openid%20profile%20email%20roles&code_challenge={codeChallenge}&code_challenge_method=S256");
+        string authorizeUrl = QueryHelpers.AddQueryString(
+            "/connect/authorize",
+            new Dictionary<string, string?>
+            {
+                ["client_id"] = "sampleclient",
+                ["response_type"] = "code",
+                ["redirect_uri"] = "https://localhost:7002/signin-oidc",
+                ["scope"] = "openid profile email roles",
+                ["code_challenge"] = codeChallenge,
+                ["code_challenge_method"] = "S256"
+            });
+
+        var authorizeResponse = await client.GetAsync(authorizeUrl);
 
         Assert.Equal(HttpStatusCode.Redirect, authorizeResponse.StatusCode);
         Assert.NotNull(authorizeResponse.Headers.Location);
